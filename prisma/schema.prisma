@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id Int @id() @default(autoincrement())
+  isbn  String
+  name String
+  price Int
+  orderDetails OrderDetail[]
+}
+
+// in model if  use this pattern "detail String?"
+
+model Customer {
+   id Int @id() @default(autoincrement())
+   name String
+   phone String 
+   address String
+   Order Order[]
+}
+
+model Order {
+  id Int @id() @default(autoincrement())
+  orderDate DateTime
+  payDate DateTime?
+  customerId  Int
+  customer Customer @relation(fields: [customerId],references: [id]) 
+  orderDetail OrderDetail[]
+}
+
+model OrderDetail{
+  id  Int @id() @default(autoincrement())
+  orderId Int
+  bookId Int
+  book Book @relation(fields: [bookId], references: [id])
+  Order Order @relation(fields: [orderId], references: [id])
+}
+
+
+model User{
+  id Int @id() @default(autoincrement())
+  name String 
+  level String
+  username String
+  password String
+  status String @default("use")
+}
+
+
+model FoodType{
+  id Int @id() @default(autoincrement())
+  name String
+  remark String?
+  status String @default("use")
+  FoodSizes FoodSize[]
+  Tastes Taste[]
+  Foods Food[]
+}
+
+
+model FoodSize{
+  id Int @id() @default(autoincrement())
+  name String
+  remark String?
+  moneyAdded Int @default(0)
+  status String @default("use") 
+  foodTypeId Int
+  FoodType FoodType @relation(fields: [foodTypeId],references: [id])
+ }
+
+
+ model Taste{
+    id Int @id() @default(autoincrement())
+    name String
+    remark String?
+    status String @default("use")
+    foodTypeId Int
+    FoodType FoodType @relation(fields: [foodTypeId],references: [id])
+    
+ }
+
+ model Food{
+    id Int @id() @default(autoincrement())
+    foodTypeId Int
+    name String
+    remark String?
+    price Int
+    img String
+    foodType String @default("food")
+    status String @default("use")
+    FoodType FoodType @relation(fields: [foodTypeId],references: [id])
+    SaleTemps SaleTemp[]
+    SaleTempDetails SaleTempDetail[]
+ }
+
+
+ model SaleTemp {
+   id Int @id() @default(autoincrement())
+   foodId Int
+   qty Int
+   price Int
+   tableNo Int
+   userId Int
+   Food Food @relation(fields: [foodId], references: [id])
+   SalTempDetails SaleTempDetail[]
+   
+ }
+
+ model SaleTempDetail{
+    id Int @id() @default(autoincrement())
+    saleTempId Int
+    addedMoney Int?
+    tasteId Int?
+    foodId Int
+    Food Food @relation(fields: [foodId], references: [id],onDelete: NoAction, onUpdate: NoAction)
+    SaleTemp SaleTemp @relation(fields: [saleTempId], references: [id]) 
+ }

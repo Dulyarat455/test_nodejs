@@ -1,0 +1,29 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- CreateTable
+CREATE TABLE [dbo].[Taste] (
+    [id] INT NOT NULL IDENTITY(1,1),
+    [name] NVARCHAR(1000) NOT NULL,
+    [remark] NVARCHAR(1000),
+    [status] NVARCHAR(1000) NOT NULL CONSTRAINT [Taste_status_df] DEFAULT 'use',
+    [foodTypeId] INT NOT NULL,
+    CONSTRAINT [Taste_pkey] PRIMARY KEY CLUSTERED ([id])
+);
+
+-- AddForeignKey
+ALTER TABLE [dbo].[Taste] ADD CONSTRAINT [Taste_foodTypeId_fkey] FOREIGN KEY ([foodTypeId]) REFERENCES [dbo].[FoodType]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH
